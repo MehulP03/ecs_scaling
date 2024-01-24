@@ -1,0 +1,29 @@
+name: ECS scaling
+on:
+    workflow_dispatch: 
+        inputs:
+            name: 
+                description: Up scale or Down scale
+                required: true
+                default: upscale
+                type: choice
+                options:
+                    - upscale
+                    - downscale
+                
+jobs:
+    scale:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out the repository to the runner
+              uses: actions/checkout@v4
+            - name: Configure AWS Credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY}}
+                aws-region: ap-south-1
+            - name: Make the shell file exeutable
+              run: chmod +x multiple_cluster_autoscale.sh
+            - name: Scaling ECS
+              run: ./multiple_cluster_autoscale.sh ${{inputs.name}}
